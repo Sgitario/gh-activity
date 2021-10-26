@@ -51,6 +51,11 @@
       <artifactId>quarkus-openshift</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.kohsuke</groupId>
+      <artifactId>github-api</artifactId>
+      <version>1.135</version>
+    </dependency>
+    <dependency>
       <groupId>io.quarkiverse.prettytime</groupId>
       <artifactId>quarkus-prettytime</artifactId>
       <version>0.0.4</version>

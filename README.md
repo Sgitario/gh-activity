@@ -1,6 +1,6 @@
 # GitHub Activity Application
 
-This project aims at centralizing all the information about the status of Quarkus QE activities in upstream.
+This project aims at centralizing all the information about the status of QuarkusIO activities in upstream.
 
 ## Setup
 In your application directory, create a .env file containing your OAuth token:
@@ -63,3 +63,7 @@ stringData:
 
 Deploy the secret using `oc create -f secret.yaml` command, update it using `oc replace -f secret.yaml` command. 
 
+# Testing
+
+Github Graphql Site to test your queries: `https://docs.github.com/en/graphql/overview/explorer`
+Public Graphql Schema: https://docs.github.com/en/graphql/overview/public-schema

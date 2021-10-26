@@ -1,0 +1,152 @@
+{#include base}
+{#title}Labels stats{/title}
+
+{#body}
+<div class="ui main container">
+    <div class="ui icon message">
+        <i class="small sync icon"></i>
+        <div class="content">
+            <p>Updated {inject:prettyTime.format(stats.updated)} (refreshed every 6 hours).</p>
+        </div>
+    </div>
+
+    <h2>Pull Request opened</h2>
+    <div class="ui message" style="height:1500px !important;">
+        <canvas id="canvas-stacked-quarkusio-pulls-opened"></canvas>
+    </div>
+
+    <h2>Issues opened</h2>
+    <div class="ui message" style="height:1500px !important;">
+        <canvas id="canvas-stacked-quarkusio-issues-opened"></canvas>
+    </div>
+</div>
+{/body}
+{#scripts}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+<script>
+			var barIssuesOpened = {
+				type: 'pie',
+				data: {
+					labels: [
+					    {#for label in stats.labels}
+                            "{label}",
+                        {/for}
+					],
+					datasets: [
+                    {
+						label: 'Issues Opened',
+						backgroundColor: [
+						{#for label in stats.labels}
+						    getColor({index}),
+						{/for}
+						],
+						data: [
+						{#for label in stats.labels}
+						    {stats.openIssues.get(label)},
+						{/for}
+						]
+					}
+					]
+				},
+				options: {
+					onClick: barChartClickIssuesOpened,
+					title: { display: true,	text: 'Issues opened in QuarkusIO GitHub organisation' },
+					tooltips: { mode: 'index', intersect: false },
+					legend: { onHover: function(e) { e.target.style.cursor = 'pointer'; } },
+					hover: { onHover: (event, chartElement) => { event.target.style.cursor = chartElement[0] ? 'pointer' : 'default'; } },
+					responsive: true,
+					maintainAspectRatio: false
+				}
+			};
+			var barPullsOpened = {
+				type: 'pie',
+				data: {
+					labels: [
+					    {#for label in stats.labels}
+                            "{label}",
+                        {/for}
+					],
+					datasets: [
+                    {
+						label: 'Pull Requests Opened',
+						backgroundColor: [
+						{#for label in stats.labels}
+						    getColor({index}),
+						{/for}
+						],
+						data: [
+						{#for label in stats.labels}
+						    {stats.openPrs.get(label)},
+						{/for}
+						]
+					}
+					]
+				},
+				options: {
+					onClick: barChartClickPullsOpened,
+					title: { display: true,	text: 'Pull Requests opened in QuarkusIO GitHub organisation' },
+					tooltips: { mode: 'index', intersect: false },
+					legend: { onHover: function(e) { e.target.style.cursor = 'pointer'; } },
+					hover: { onHover: (event, chartElement) => { event.target.style.cursor = chartElement[0] ? 'pointer' : 'default'; } },
+					responsive: true,
+					maintainAspectRatio: false
+				}
+			};
+
+			function barChartClickIssuesOpened(event, array){
+				if(array[0]) {
+					var selectedLabel = getLabel(array[0].index);
+					window.open("https://github.com/search?q=label:" + selectedLabel + "+is:issue+is:open+org:quarkusio", '_blank');
+				}
+			}
+			function barChartClickPullsOpened(event, array){
+				if(array[0]) {
+					var selectedLabel = getLabel(array[0].index);
+					window.open("https://github.com/search?q=label:" + selectedLabel + "+is:pr+is:open+org:quarkusio", '_blank');
+				}
+			}
+			function getColor(index) {
+			    if (index == 0) { return 'rgba(255, 99, 132, 0.8)'}
+			    if (index == 1) { return 'rgba(255, 159, 64, 0.8)'}
+			    if (index == 2) { return 'rgba(255, 205, 86, 0.8)'}
+			    if (index == 3) { return 'rgba(75, 192, 192, 0.8)'}
+			    if (index == 4) { return 'rgba(54, 162, 245, 0.8)'}
+			    if (index == 5) { return 'rgba(153, 102, 255, 0.8)'}
+			    if (index == 6) { return 'rgba(191, 201, 202, 0.8)'}
+                var letters = '0123456789ABCDEF'.split('');
+                var color = '#';
+                for (var i = 0; i < 6; i++ ) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
+
+            function getLabel(index) {
+			    {#for label in stats.labels}
+                    if (index == {index}) { return "{label}"}
+                {/for}
+            }
+
+			window.onload = function() {
+				var ctxIssuesOpened = document.getElementById('canvas-stacked-quarkusio-issues-opened').getContext('2d');
+				var ctxPullsOpened = document.getElementById('canvas-stacked-quarkusio-pulls-opened').getContext('2d');
+
+				window.barChartIssuesOpened = new Chart(ctxIssuesOpened, barIssuesOpened);
+				window.barChartPullsOpened = new Chart(ctxPullsOpened, barPullsOpened);
+			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+{/scripts}
+{/include}

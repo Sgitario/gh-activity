@@ -1,55 +1,40 @@
 package io.quarkus.activity;
 
-import io.quarkus.activity.github.GitHubService;
-import io.quarkus.qute.Template;
-import io.quarkus.qute.TemplateInstance;
+import java.io.IOException;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.io.IOException;
-import java.util.Map;
+
+import io.quarkus.activity.github.GitHubService;
+import io.quarkus.qute.Template;
+import io.quarkus.qute.TemplateInstance;
 
 @Path("/")
 public class ActivityResource {
 
     @Inject
-    GitHubActivitiesService gitHubActivitiesService;
-
-    @Inject
     GitHubMonthlyStatsService gitHubMonthlyStatsService;
 
     @Inject
-    GitHubOpenPrQueueService gitHubOpenPrQueueService;
+    GitHubLabelsStatsService gitHubLabelsStatsService;
 
     @Inject
     GitHubService gitHubService;
 
     @Inject
-    GitHubDailyStatusService gitHubDailyStatusService;
-
-    @Inject
-    Template activities;
+    Template labelsStats;
 
     @Inject
     Template monthlyStats;
 
-    @Inject
-    Template openPrQueue;
-
-    @Inject
-    Template dailyStatus;
-
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public TemplateInstance getActivities() throws IOException {
-
-        return activities.data(
-                "logins", gitHubService.getLogins(),
-                "activities", gitHubActivitiesService.getGitHubActivities(),
-                "updated", gitHubActivitiesService.getUpdated());
+    public TemplateInstance getLabelsStats() throws IOException {
+        return labelsStats.data("stats", gitHubLabelsStatsService.getLabelsStats());
     }
 
     @GET
@@ -59,27 +44,11 @@ public class ActivityResource {
         return monthlyStats.data(
                 "logins", gitHubService.getLogins(),
                 "stats", gitHubMonthlyStatsService.getMonthlyStats(),
-                "colors", Map.of("rsvoboda", "RED", "mjurc", "BLUE")
+                "colors", defaultColours()
         );
     }
 
-    @GET
-    @Path("/open-pr-queue")
-    @Produces(MediaType.TEXT_HTML)
-    public TemplateInstance getOpenPrsQueue() throws IOException {
-        return openPrQueue.data(
-                "logins", gitHubService.getLogins(),
-                "organization", gitHubOpenPrQueueService.getOpenPrQueueInOrganization()
-        );
-    }
-
-    @GET
-    @Path("/daily-status")
-    @Produces(MediaType.TEXT_HTML)
-    public TemplateInstance getDailyStatus() throws IOException {
-        return dailyStatus.data(
-                "logins", gitHubService.getLogins(),
-                "repositories", gitHubDailyStatusService.getRepositoriesWithDailyStatus()
-        );
+    private Map<String, String> defaultColours() {
+        return Map.of("Sgitario", "RED", "geoand", "BLUE");
     }
 }

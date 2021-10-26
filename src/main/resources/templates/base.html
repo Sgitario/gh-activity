@@ -13,25 +13,11 @@
 <div class="ui fixed inverted menu main-menu">
     <a class="header item" href="/">
         <img class="logo" src="https://design.jboss.org/quarkus/logo/final/SVG/quarkus_icon_rgb_reverse.svg" alt="Quarkus logo" width="40" height="30">
-        Activity
+        Labels Stats
     </a>
-
-    {#for login in logins}
-    <a class="header item" href="/#{login}">
-        <small>{login}</small>&nbsp;&nbsp;
-    </a>
-    {/for}
 
     <a class="header item" href="/monthly-stats">
-        Monthly stats
-    </a>
-
-    <a class="header item" href="/open-pr-queue">
-        Open PR Queue
-    </a>
-
-    <a class="header item" href="/daily-status">
-        Daily Status
+        User Monthly Stats
     </a>
 </div>
 <div class="main-content">
