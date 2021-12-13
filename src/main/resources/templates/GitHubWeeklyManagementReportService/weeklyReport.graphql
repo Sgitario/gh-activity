@@ -1,0 +1,162 @@
+{
+  updated_tasks: search(query: "is:issue label:task -label:recurrent updated:{timeWindow} org:snowdrop repo:team -label:invalid -label:wontfix", type: ISSUE, first: 100) {
+    nodes {
+      ... on Issue {
+        number
+        title
+        createdAt
+        updatedAt
+        url
+        state
+        assignees(first: 100) {
+          nodes {
+            login
+          }
+        }
+        repository {
+          id
+          nameWithOwner
+        }
+        labels(first: 100) {
+          nodes {
+            name
+          }
+        }
+        state
+        timelineItems(first: 100, itemTypes: [CROSS_REFERENCED_EVENT, CLOSED_EVENT]) {
+          nodes {
+            ... on CrossReferencedEvent {
+              source {
+                ... on PullRequest {
+                  number
+                  url
+                  updatedAt
+                  isDraft
+                }
+              }
+            }
+
+            ... on ClosedEvent {
+              closer {
+                ... on PullRequest {
+                  number
+                  url
+                  updatedAt
+                  isDraft
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  recurrent_tasks: search(query: "is:issue label:task label:recurrent is:open org:snowdrop repo:team -label:invalid -label:wontfix", type: ISSUE, first: 100) {
+    nodes {
+      ... on Issue {
+        number
+        title
+        createdAt
+        updatedAt
+        url
+        state
+        assignees(first: 100) {
+          nodes {
+            login
+          }
+        }
+        repository {
+          id
+          nameWithOwner
+        }
+        labels(first: 100) {
+          nodes {
+            name
+          }
+        }
+        state
+        timelineItems(first: 100, itemTypes: [CROSS_REFERENCED_EVENT, CLOSED_EVENT]) {
+          nodes {
+            ... on CrossReferencedEvent {
+              source {
+                ... on PullRequest {
+                  number
+                  url
+                  updatedAt
+                  isDraft
+                }
+              }
+            }
+
+            ... on ClosedEvent {
+              closer {
+                ... on PullRequest {
+                  number
+                  url
+                  updatedAt
+                  isDraft
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  epics: search(query: "is:issue label:Epic org:snowdrop repo:team -label:invalid -label:wontfix sort:updated", type: ISSUE, first: 100) {
+    nodes {
+      ... on Issue {
+        number
+        title
+        createdAt
+        updatedAt
+        url
+        state
+        assignees(first: 100) {
+          nodes {
+            login
+          }
+        }
+        repository {
+          id
+          nameWithOwner
+        }
+        labels(first: 100) {
+          nodes {
+            name
+          }
+        }
+        state
+        timelineItems(first: 100, itemTypes: [CROSS_REFERENCED_EVENT, CLOSED_EVENT]) {
+          nodes {
+            ... on CrossReferencedEvent {
+              source {
+                ... on PullRequest {
+                  number
+                  url
+                  updatedAt
+                  isDraft
+                }
+              }
+            }
+
+            ... on ClosedEvent {
+              closer {
+                ... on PullRequest {
+                  number
+                  url
+                  updatedAt
+                  isDraft
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  rateLimit {
+    cost
+    remaining
+  }
+}

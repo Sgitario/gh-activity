@@ -1,0 +1,58 @@
+{#include base}
+{#title}Open PR Queue{/title}
+
+{#body}
+<div class="ui main container">
+    <div class="ui icon message">
+        <i class="small sync icon"></i>
+        <div class="content">
+            <p>Updated {inject:prettyTime.format(result.updated)} (refreshed every 10 minutes).</p>
+        </div>
+    </div>
+    <h2>Open Pull Requests Summary</h2>
+    <table class="ui celled striped table collapsing">
+        <thead>
+        <tr>
+            <th class="ten wide">Repo</th>
+            <th class="two wide">Count</th>
+        </tr>
+        </thead>
+        <tbody>
+        {#for entry in result.repositories}
+        <tr>
+            <td><a href="#{entry.key}">{entry.key}</a></td>
+            <td><a href="#{entry.key}">{entry.value.size}</a></td>
+        </tr>
+        {/for}
+        </tbody>
+    </table>
+    </ul>
+
+    {#for entry in result.repositories}
+    <a name="{entry.key}"></a>
+    <h2>{entry.value.size} Open Pull Requests in {entry.key}</h2>
+    <table class="ui celled striped table">
+        <thead>
+        <tr>
+            <th>Created At</th>
+            <th>Title</th>
+            <th>Author</th>
+        </tr>
+        </thead>
+        <tbody>
+        {#for pullRequest in entry.value}
+        <tr>
+            <td>{inject:prettyTime.format(pullRequest.created)}</td>
+            <td>
+                <a href="{pullRequest.url}">{pullRequest.title} <b>#{pullRequest.shortUrl}</b></a>
+            </td>
+            <td>{pullRequest.author}</td>
+        </tr>
+        {/for}
+        </tbody>
+    </table>
+
+    {/for}
+</div>
+{/body}
+{/include}

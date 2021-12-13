@@ -1,0 +1,86 @@
+{
+{#for login in logins}
+  {login}_issues_assigned: search(query: "assignee:{login} is:issue updated:{timeWindow} -org:snowdrop-zen -org:quarkus-qe -org:jacobdotcosta -label:invalid -label:wontfix -label:Epic", type: ISSUE, first: 100) {
+    nodes {
+      ... on Issue {
+        number
+        title
+        createdAt
+        updatedAt
+        url
+        state
+        assignees(first: 100) {
+          nodes {
+            login
+          }
+        }
+        repository {
+          id
+          nameWithOwner
+        }
+        labels(first: 100) {
+          nodes {
+            name
+          }
+        }
+        state
+        timelineItems(first: 100, itemTypes: [CROSS_REFERENCED_EVENT, CLOSED_EVENT]) {
+          nodes {
+            ... on CrossReferencedEvent {
+              source {
+                ... on PullRequest {
+                  number
+                  url
+                  updatedAt
+                  isDraft
+                }
+              }
+            }
+
+            ... on ClosedEvent {
+              closer {
+                ... on PullRequest {
+                  number
+                  url
+                  updatedAt
+                  isDraft
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  {login}_prs_created: search(query: "author:{login} is:pr updated:{timeWindow} -org:snowdrop-zen -org:quarkus-qe -label:invalid -label:wontfix", type: ISSUE, first: 100) {
+      nodes {
+        ... on PullRequest {
+          number
+          title
+          createdAt
+          updatedAt
+          url
+          state
+          isDraft
+          author{
+            login
+          }
+          repository {
+            id
+            nameWithOwner
+          }
+          labels(first: 100) {
+            nodes {
+              name
+            }
+          }
+          state
+        }
+      }
+    }
+{/for}
+  rateLimit {
+    cost
+    remaining
+  }
+}

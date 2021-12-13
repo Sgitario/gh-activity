@@ -1,0 +1,98 @@
+{#include base}
+{#title}Management Weekly Report for {report.week}{/title}
+
+{#body}
+<div class="ui main container">
+    <p>
+    <h2>Management Weekly Report</h2>
+    <form id="newPostForm" method="POST" enctype="multipart/form-data">
+        <label for="date">Date: </label>
+        <input id="date" type="date" name="date" required value="{report.week}"/>
+        <input type="submit" value="Update"/>
+    </form>
+    </p>
+    <h2>Summary</h2>
+    <table class="ui celled striped table collapsing">
+        <thead>
+        <tr>
+            <th class="ten wide">Group</th>
+            <th class="two wide">Count</th>
+        </tr>
+        </thead>
+        <tbody>
+        {#if report.projects.size > 0}
+        <tr>
+            <td>Projects</a></td>
+            <td>{report.projects.size}</td>
+        </tr>
+        {/if}
+        {#if report.getUpdatedTasksSize() > 0}
+        <tr>
+            <td>Tasks</td>
+            <td>{report.getUpdatedTasksSize()}</td>
+        </tr>
+        {/if}
+        {#if report.getRecurrentTasksSize() > 0}
+        <tr>
+            <td>Weekly Tasks</td>
+            <td>{report.getRecurrentTasksSize()}</td>
+        </tr>
+        {/if}
+        <tr>
+            <td>Updated Roadmap</td>
+            <td>{report.getUpdatedEpicsSize()}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    {#for project in report.projects}
+    <h2>{project.name}</h2>
+    {#if project.updatedTasks.size > 0}
+    <h4>Tasks</h4>
+    <ul>
+        {#for task in project.updatedTasks}
+        <ul>
+            <li>{task.getStatus()}: {task.name} <a href="{task.url}">#{task.id}</a> assigned to {#for assignee in task.assignees}
+                {assignee}{#if hasNext}, {/if} {/for}
+            </li>
+        </ul>
+        {/for}
+    </ul>
+    {/if}
+    {#if project.recurrentTasks.size > 0}
+    <h4>Weekly Tasks</h4>
+    <ul>
+        {#for task in project.recurrentTasks}
+        <ul>
+            <li>{task.name} <a href="{task.url}">#{task.id}</a> assigned to
+                {#for assignee in task.assignees} {assignee}{#if hasNext}, {/if} {/for}
+            </li>
+        </ul>
+        {/for}
+    </ul>
+    {/if}
+    <h4>Roadmap</h4>
+    <ul>
+        {#for epic in project.updatedEpics}
+        <ul>
+            {#if epic.tasks.size > 0}
+            <li><a href="{epic.url}">{epic.name}</a> (Progress {epic.finishedTasks} / {epic.totalTasks})</li>
+            {#for task in epic.tasks}
+            <ul>
+                <li>{task.getStatus()}: {task.name} <a href="{task.url}">{task.url}</a> assigned to {#for assignee in task.assignees}
+                    {assignee}{#if hasNext}, {/if} {/for}
+                </li>
+            </ul>
+            {/for}
+            {#else}
+            <li>{epic.data.getStatus()}: {epic.name} <a href="{epic.url}">{epic.url}</a> assigned to {#for assignee in epic.data.assignees}
+                {assignee}{#if hasNext}, {/if} {/for}
+            </li>
+            {/if}
+        </ul>
+        {/for}
+    </ul>
+    {/for}
+</div>
+{/body}
+{/include}

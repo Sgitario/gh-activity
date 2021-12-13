@@ -1,0 +1,11 @@
+query getReposInOrganization {
+  search(query: "org:{organization}", type: REPOSITORY, first: {limit}) {
+    edges {
+      node {
+        ... on Repository {
+          name
+        }
+      }
+    }
+  }
+}

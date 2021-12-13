@@ -1,0 +1,41 @@
+{#include base}
+{#title}Team weekly Report for {report.week}{/title}
+
+{#body}
+<div class="ui main container">
+    <p>
+    <h2>Team Weekly Report</h2>
+    <form id="newPostForm" method="POST" enctype="multipart/form-data">
+        <label for="date">Date: </label>
+        <input id="date" type="date" name="date" required value="{report.week}"/>
+        <label for="login">For: </label>
+        <select id="login" type="text" name="login" required value="{report.selectedLogin}">
+            <option value="ALL" {#if report.selectedLogin == 'ALL'}selected{/if}>All</option>
+            {#for login in logins}
+            <option value="{login}" {#if report.selectedLogin == login}selected{/if}>{login}</option>
+            {/for}
+        </select>
+
+        <input type="submit" value="Update"/>
+    </form>
+    </p>
+    {#for project in report.projects}
+    <p>
+    <ul>
+        <li><b>{project.name}</b></li>
+        <ul>
+            {#for user in project.tasks.keySet}
+            <li>{user}</li>
+            {#for task in project.tasks.get(user)}
+            <ul>
+                <li>{task.getStatus()}: {task.name} <a href="{task.url}">{task.url}</a></li>
+            </ul>
+            {/for}
+            {/for}
+        </ul>
+    </ul>
+    </p>
+    {/for}
+</div>
+{/body}
+{/include}

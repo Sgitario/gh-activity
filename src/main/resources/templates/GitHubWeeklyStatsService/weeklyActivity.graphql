@@ -1,0 +1,26 @@
+{
+{#for login in logins}
+  {login}_issues_reported: search(query: "author:{login} is:issue updated:{timeWindow} -org:snowdrop-zen", type: ISSUE, first: 1) {
+    issueCount
+  }
+  {login}_issues_assigned: search(query: "assignee:{login} is:issue updated:{timeWindow} -org:snowdrop-zen", type: ISSUE, first: 1) {
+    issueCount
+  }
+  {login}_issues_participant: search(query: "commenter:{login} is:issue updated:{timeWindow} -org:snowdrop-zen", type: ISSUE, first: 1) {
+    issueCount
+  }
+  {login}_prs_created: search(query: "author:{login} is:pr updated:{timeWindow} -org:snowdrop-zen", type: ISSUE, first: 1) {
+    issueCount
+  }
+  {login}_prs_reviewed: search(query: "reviewed-by:{login} -author:{login} is:pr updated:{timeWindow} -org:snowdrop-zen", type: ISSUE, first: 1) {
+    issueCount
+  }
+  {login}_prs_merged: search(query: "author:{login} is:pr updated:{timeWindow} is:merged -org:snowdrop-zen", type: ISSUE, first: 1) {
+    issueCount
+  }
+{/for}
+  rateLimit {
+    cost
+    remaining
+  }
+}

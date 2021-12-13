@@ -1,5 +1,5 @@
 {#include base}
-{#title}Monthly stats{/title}
+{#title}Weekly stats{/title}
 
 {#body}
 <div class="ui main container">
@@ -10,29 +10,29 @@
         </div>
     </div>
 
-    <h2>Pull Request created per month in QuarkusIO GitHub organisation</h2>
+    <h2>Pull Request created</h2>
     <div class="ui message">
-        <canvas id="canvas-stacked-quarkusio-prs-created"></canvas>
+        <canvas id="canvas-stacked-prs-created"></canvas>
     </div>
 
-    <h2>Pull Request reviewed per month in QuarkusIO GitHub organisation</h2>
+    <h2>Pull Request reviewed</h2>
     <div class="ui message">
-        <canvas id="canvas-stacked-quarkusio-prs-reviewed"></canvas>
+        <canvas id="canvas-stacked-prs-reviewed"></canvas>
     </div>
 
-    <h2>Issues reported per month in QuarkusIO GitHub organisation</h2>
+    <h2>Issues reported</h2>
     <div class="ui message">
-        <canvas id="canvas-stacked-quarkusio-issues-reported"></canvas>
+        <canvas id="canvas-stacked-issues-reported"></canvas>
     </div>
 
-    <h2>Issues assigned per month in QuarkusIO GitHub organisation</h2>
+    <h2>Issues assigned</h2>
     <div class="ui message">
-        <canvas id="canvas-stacked-quarkusio-issues-assigned"></canvas>
+        <canvas id="canvas-stacked-issues-assigned"></canvas>
     </div>
 
-    <h2>Issues participant per month in QuarkusIO GitHub organisation</h2>
+    <h2>Issues participant</h2>
     <div class="ui message">
-        <canvas id="canvas-stacked-quarkusio-issues-participant"></canvas>
+        <canvas id="canvas-stacked-issues-participant"></canvas>
     </div>
 </div>
 {/body}
@@ -43,12 +43,12 @@
 				type: 'bar',
 				data: {
 					labels: [
-					    {#for month in stats.months}
-                            "{month}",
+					    {#for week in stats.weeks}
+                            "{week}",
                         {/for}
 					],
 					datasets: [
-                    {#for entry in stats.quarkusioIssuesReported}
+                    {#for entry in stats.issuesReported}
                     {
 						label: '{entry.key}',
 						backgroundColor: getColor({index}),
@@ -63,7 +63,7 @@
 				},
 				options: {
 					onClick: barChartClickIssuesReported,
-					title: { display: true,	text: 'Issues reported per month in QuarkusIO GitHub organisation' },
+					title: { display: true,	text: 'Issues reported' },
 					tooltips: { mode: 'index', intersect: false },
 					legend: { onHover: function(e) { e.target.style.cursor = 'pointer'; } },
 					hover: { onHover: (event, chartElement) => { event.target.style.cursor = chartElement[0] ? 'pointer' : 'default'; } },
@@ -78,12 +78,12 @@
 				type: 'bar',
 				data: {
 					labels: [
-					    {#for month in stats.months}
-                            "{month}",
+					    {#for week in stats.weeks}
+                            "{week}",
                         {/for}
 					],
 					datasets: [
-                    {#for entry in stats.quarkusioIssuesAssigned}
+                    {#for entry in stats.issuesAssigned}
                     {
 						label: '{entry.key}',
 						backgroundColor: getColor({index}),
@@ -98,7 +98,7 @@
 				},
 				options: {
 					onClick: barChartClickIssuesAssigned,
-					title: { display: true,	text: 'Issues assigned per month in QuarkusIO GitHub organisation' },
+					title: { display: true,	text: 'Issues assigned' },
 					tooltips: { mode: 'index', intersect: false },
 					legend: { onHover: function(e) { e.target.style.cursor = 'pointer'; } },
 					hover: { onHover: (event, chartElement) => { event.target.style.cursor = chartElement[0] ? 'pointer' : 'default'; } },
@@ -113,12 +113,12 @@
 				type: 'bar',
 				data: {
 					labels: [
-					    {#for month in stats.months}
-                            "{month}",
+					    {#for week in stats.weeks}
+                            "{week}",
                         {/for}
 					],
 					datasets: [
-                    {#for entry in stats.quarkusioIssuesParticipant}
+                    {#for entry in stats.issuesParticipant}
                     {
 						label: '{entry.key}',
 						backgroundColor: getColor({index}),
@@ -133,7 +133,7 @@
 				},
 				options: {
 					onClick: barChartClickIssuesParticipant,
-					title: { display: true,	text: 'Issues participant per month in QuarkusIO GitHub organisation' },
+					title: { display: true,	text: 'Issues participant' },
 					tooltips: { mode: 'index', intersect: false },
 					legend: { onHover: function(e) { e.target.style.cursor = 'pointer'; } },
 					hover: { onHover: (event, chartElement) => { event.target.style.cursor = chartElement[0] ? 'pointer' : 'default'; } },
@@ -148,12 +148,12 @@
 				type: 'bar',
 				data: {
 					labels: [
-					    {#for month in stats.months}
-                            "{month}",
+					    {#for week in stats.weeks}
+                            "{week}",
                         {/for}
 					],
 					datasets: [
-                    {#for entry in stats.quarkusioPRsCreated}
+                    {#for entry in stats.prsCreated}
                     {
 						label: '{entry.key}',
 						backgroundColor: getColor({index}),
@@ -168,7 +168,7 @@
 				},
 				options: {
 					onClick: barChartClickPullsCreated,
-					title: { display: true,	text: 'Pull Requests created per month in QuarkusIO GitHub organisation' },
+					title: { display: true,	text: 'Pull Requests created' },
 					tooltips: { mode: 'index', intersect: false },
 					legend: { onHover: function(e) { e.target.style.cursor = 'pointer'; } },
 					hover: { onHover: (event, chartElement) => { event.target.style.cursor = chartElement[0] ? 'pointer' : 'default'; } },
@@ -183,12 +183,12 @@
 				type: 'bar',
 				data: {
 					labels: [
-					    {#for month in stats.months}
-                            "{month}",
+					    {#for week in stats.weeks}
+                            "{week}",
                         {/for}
 					],
 					datasets: [
-                    {#for entry in stats.quarkusioPRsReviewed}
+                    {#for entry in stats.prsReviewed}
                     {
 						label: '{entry.key}',
 						backgroundColor: getColor({index}),
@@ -203,7 +203,7 @@
 				},
 				options: {
 					onClick: barChartClickPullsReviewed,
-					title: { display: true,	text: 'Pull Requests reviewed per month in QuarkusIO GitHub organisation' },
+					title: { display: true,	text: 'Pull Requests reviewed' },
 					tooltips: { mode: 'index', intersect: false },
 					legend: { onHover: function(e) { e.target.style.cursor = 'pointer'; } },
 					hover: { onHover: (event, chartElement) => { event.target.style.cursor = chartElement[0] ? 'pointer' : 'default'; } },
@@ -220,7 +220,7 @@
 					// console.table(array[0]._model);
 					var activePoint = window.barChartIssuesReported.getElementAtEvent(event)[0];
 					var selectedLogin = getLogin(activePoint._datasetIndex)
-					window.open("https://github.com/search?q=author:" + selectedLogin + "+created:" + array[0]._model.label + "+is:issue+org:quarkusio", '_blank');
+					window.open("https://github.com/search?q=author:" + selectedLogin + "+created:" + array[0]._model.label + "+is:task", '_blank');
 				}
 			}
 			function barChartClickIssuesAssigned(event, array){
@@ -228,7 +228,7 @@
 					// console.table(array[0]._model);
 					var activePoint = window.barChartIssuesAssigned.getElementAtEvent(event)[0];
 					var selectedLogin = getLogin(activePoint._datasetIndex)
-					window.open("https://github.com/search?q=assignee:" + selectedLogin + "+created:" + array[0]._model.label + "+is:issue+org:quarkusio", '_blank');
+					window.open("https://github.com/search?q=assignee:" + selectedLogin + "+created:" + array[0]._model.label + "+is:task", '_blank');
 				}
 			}
 			function barChartClickIssuesParticipant(event, array){
@@ -236,7 +236,7 @@
 					// console.table(array[0]._model);
 					var activePoint = window.barChartIssuesParticipant.getElementAtEvent(event)[0];
 					var selectedLogin = getLogin(activePoint._datasetIndex)
-					window.open("https://github.com/search?q=commenter:" + selectedLogin + "+created:" + array[0]._model.label + "+is:issue+org:quarkusio", '_blank');
+					window.open("https://github.com/search?q=commenter:" + selectedLogin + "+created:" + array[0]._model.label + "+is:task", '_blank');
 				}
 			}
 			function barChartClickPullsCreated(event, array){
@@ -244,7 +244,7 @@
 					// console.table(array[0]._model);
 					var activePoint = window.barChartPullsCreated.getElementAtEvent(event)[0];
 					var selectedLogin = getLogin(activePoint._datasetIndex)
-					window.open("https://github.com/search?q=author:" + selectedLogin + "+created:" + array[0]._model.label + "+is:pr+org:quarkusio", '_blank');
+					window.open("https://github.com/search?q=author:" + selectedLogin + "+created:" + array[0]._model.label + "+is:pr", '_blank');
 				}
 			}
 			function barChartClickPullsReviewed(event, array){
@@ -252,7 +252,7 @@
 					// console.table(array[0]._model);
 					var activePoint = window.barChartPullsReviewed.getElementAtEvent(event)[0];
 					var selectedLogin = getLogin(activePoint._datasetIndex)
-					window.open("https://github.com/search?q=reviewed-by:" + selectedLogin + "+-author:" + selectedLogin + "+created:" + array[0]._model.label + "+is:pr+org:quarkusio", '_blank');
+					window.open("https://github.com/search?q=reviewed-by:" + selectedLogin + "+-author:" + selectedLogin + "+created:" + array[0]._model.label + "+is:pr", '_blank');
 				}
 			}
 			function getColor(index) {
@@ -277,11 +277,11 @@
             }
 
 			window.onload = function() {
-				var ctxIssuesReported = document.getElementById('canvas-stacked-quarkusio-issues-reported').getContext('2d');
-				var ctxIssuesAssigned = document.getElementById('canvas-stacked-quarkusio-issues-assigned').getContext('2d');
-				var ctxIssuesParticipant = document.getElementById('canvas-stacked-quarkusio-issues-participant').getContext('2d');
-				var ctxPullsCreated = document.getElementById('canvas-stacked-quarkusio-prs-created').getContext('2d');
-				var ctxPullsReviewed = document.getElementById('canvas-stacked-quarkusio-prs-reviewed').getContext('2d');
+				var ctxIssuesReported = document.getElementById('canvas-stacked-issues-reported').getContext('2d');
+				var ctxIssuesAssigned = document.getElementById('canvas-stacked-issues-assigned').getContext('2d');
+				var ctxIssuesParticipant = document.getElementById('canvas-stacked-issues-participant').getContext('2d');
+				var ctxPullsCreated = document.getElementById('canvas-stacked-prs-created').getContext('2d');
+				var ctxPullsReviewed = document.getElementById('canvas-stacked-prs-reviewed').getContext('2d');
 
 				window.barChartIssuesReported = new Chart(ctxIssuesReported, barIssuesReported);
 				window.barChartIssuesAssigned = new Chart(ctxIssuesAssigned, barIssuesAssigned);

@@ -1,0 +1,16 @@
+{
+{#for repository in repositories}
+  {repository.id}_open_prs: repository(owner: "{organization}", name: "{repository.name}") {
+     pullRequests(states: OPEN, first: {limit}, orderBy: \{field: CREATED_AT, direction: DESC\}) {
+       nodes {
+         createdAt
+         title
+         url
+         author {
+           login
+         }
+       }
+     }
+  }
+{/for}
+}

@@ -1,0 +1,84 @@
+{
+{#for repository in repositories}
+  repo_{repository.getRepoId()}: repository(name: "{repository.getName()}", owner: "{repository.getOwner()}") {
+    {#for issueNumber in repository.getIssues()}
+    issue_{issueNumber}: issue(number: {issueNumber}) {
+        number
+        title
+        createdAt
+        updatedAt
+        url
+        state
+        assignees(first: 100) {
+          nodes {
+            login
+          }
+        }
+        repository {
+          id
+          nameWithOwner
+        }
+        labels(first: 100) {
+          nodes {
+            name
+          }
+        }
+        state
+        timelineItems(first: 100, itemTypes: [CROSS_REFERENCED_EVENT, CLOSED_EVENT]) {
+          nodes {
+            ... on CrossReferencedEvent {
+              source {
+                ... on PullRequest {
+                  number
+                  url
+                  createdAt
+                  updatedAt
+                  isDraft
+                }
+              }
+            }
+
+            ... on ClosedEvent {
+              closer {
+                ... on PullRequest {
+                  number
+                  url
+                  createdAt
+                  updatedAt
+                  isDraft
+                }
+              }
+            }
+          }
+        }
+    }
+    pr_{issueNumber}: pullRequest(number: {issueNumber}) {
+      number
+      title
+      createdAt
+      updatedAt
+      url
+      state
+      isDraft
+      author{
+        login
+      }
+      repository {
+        id
+        nameWithOwner
+      }
+      labels(first: 100) {
+        nodes {
+          name
+        }
+      }
+      state
+    }
+    {/for}
+  }
+{/for}
+  rateLimit {
+    cost
+    remaining
+  }
+}
