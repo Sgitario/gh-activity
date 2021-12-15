@@ -22,6 +22,7 @@ public class Task {
     private final TaskType type;
     private final List<String> assignees;
     private Set<LinkedPullRequest> linkedPullRequest = new HashSet<>();
+    private String description;
     private boolean draft = false;
 
     public Task(TaskType type, long repoId, String repoName, int id, String name, String url, Instant createdAt,
@@ -84,6 +85,14 @@ public class Task {
 
     public List<String> getAssignees() {
         return assignees;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public void setDraft(boolean draft) {

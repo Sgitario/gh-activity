@@ -71,6 +71,7 @@
         {/for}
     </ul>
     {/if}
+    {#if project.updatedEpics.size > 0}
     <h4>Roadmap</h4>
     <ul>
         {#for epic in project.updatedEpics}
@@ -92,6 +93,7 @@
         </ul>
         {/for}
     </ul>
+    {/if}
     {/for}
 </div>
 {/body}

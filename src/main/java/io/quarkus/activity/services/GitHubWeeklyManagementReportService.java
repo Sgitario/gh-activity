@@ -1,17 +1,13 @@
 package io.quarkus.activity.services;
 
-import static io.quarkus.activity.github.GitHubClientProvider.CACHEABLE_REPOSITORY_GITHUB_CLIENT;
 import static io.quarkus.activity.graphql.GraphQLUtils.DATE_SEARCH_FORMATTER;
 import static io.quarkus.activity.graphql.GraphQLUtils.handleErrors;
 import static io.quarkus.activity.utils.Dates.taskWasCreatedOrUpdatedBetween;
-import static io.quarkus.activity.zenhub.ZenHubClientProvider.CACHEABLE_EPICS_ZEN_HUB_CLIENT;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,25 +17,17 @@ import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.kohsuke.github.GHRepository;
 
-import com.zhapi.json.GetEpicIssueEntryJson;
-import com.zhapi.json.responses.GetEpicResponseJson;
-
-import io.quarkus.activity.cache.Cacheable;
-import io.quarkus.activity.cache.MapCacheable;
 import io.quarkus.activity.graphql.GraphQLClient;
 import io.quarkus.activity.model.Epic;
 import io.quarkus.activity.model.ProjectBasedOnTasksAndEpics;
 import io.quarkus.activity.model.Task;
 import io.quarkus.activity.model.WeeklyManagementReport;
 import io.quarkus.activity.model.mapping.JsonToIssueTaskMapper;
-import io.quarkus.activity.model.mapping.JsonToPullRequestTaskMapper;
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
 import io.vertx.core.json.JsonObject;
@@ -62,24 +50,19 @@ public class GitHubWeeklyManagementReportService {
     GraphQLClient graphQLClient;
 
     @Inject
-    @Named(CACHEABLE_EPICS_ZEN_HUB_CLIENT)
-    MapCacheable<Long, Map<Integer, Cacheable<GetEpicResponseJson>>> epicsZenHubClient;
-
-    @Inject
-    @Named(CACHEABLE_REPOSITORY_GITHUB_CLIENT)
-    MapCacheable<Long, GHRepository> repositoriesGitHubClient;
-
-    @Inject
     ProjectMappingService projectMappingService;
 
     @Inject
-    JsonToPullRequestTaskMapper jsonToPullRequestTaskMapper;
+    DescriptionEpicIssuesLoader descriptionEpicIssuesLoader;
+
+    @Inject
+    ZenHubEpicIssuesLoader zenHubEpicIssuesLoader;
 
     @Inject
     JsonToIssueTaskMapper jsonToIssueTaskMapper;
 
     @CheckedTemplate
-    private static class Templates {
+    public static class Templates {
         public static native TemplateInstance weeklyReport(String timeWindow);
 
         public static native TemplateInstance issues(
@@ -131,16 +114,17 @@ public class GitHubWeeklyManagementReportService {
                 // Find project by either label or repository
                 ProjectBasedOnTasksAndEpics project = findProject(allProjects, epicTask.getLabels(), epicTask.getRepoName());
 
-                List<Task> linkedTasks = Collections.emptyList();
-
-                // If it's closed, we don't enrich the epic with issues
-                if (!epicTask.isClosed()) {
-                    linkedTasks = enrichZenHubEpicLinkedIssues(epicTask, DEFAULT_ASSIGNEE);
+                // Get linked issues by description
+                List<Task> linkedTasks = descriptionEpicIssuesLoader.getLinkedIssues(epicTask, DEFAULT_ASSIGNEE);
+                if (linkedTasks.isEmpty()) {
+                    // then load linked issues by ZenHub: slow operation
+                    linkedTasks = zenHubEpicIssuesLoader.getLinkedIssues(epicTask, DEFAULT_ASSIGNEE);
                 }
 
                 // if no linked tasks, but epic was updated OR has linked updated tasks, then add epic
                 if ((linkedTasks.isEmpty() && taskWasCreatedOrUpdatedBetween(epicTask, weekStartDate, weekEndDate))
-                        || linkedTasks.stream().anyMatch(task -> taskWasCreatedOrUpdatedBetween(task, weekStartDate, weekEndDate))) {
+                        || linkedTasks.stream()
+                        .anyMatch(task -> taskWasCreatedOrUpdatedBetween(task, weekStartDate, weekEndDate))) {
 
                     // Find epic
                     Epic epic = getEpicByNameOrCreate(epicTask, project);
@@ -179,71 +163,6 @@ public class GitHubWeeklyManagementReportService {
                 project.getRecurrentTasks().add(issue.getValue());
             }
         }
-    }
-
-    private List<Task> enrichZenHubEpicLinkedIssues(Task epicTask, String defaultAssignee) throws IOException {
-        Map<Integer, Cacheable<GetEpicResponseJson>> epicResponse = epicsZenHubClient.get(epicTask.getRepoId());
-        if (epicResponse == null) {
-            // ZenHub does not have information about this epic, we ignore it.
-            return Collections.emptyList();
-        }
-
-        Cacheable<GetEpicResponseJson> cachedEpicFromZenHub = epicResponse.get(epicTask.getId());
-        if (cachedEpicFromZenHub == null) {
-            // ZenHub could not deal with the epic ID.
-            return Collections.emptyList();
-        }
-
-        GetEpicResponseJson epicFromZenHub = cachedEpicFromZenHub.get();
-        if (epicFromZenHub == null) {
-            // ZenHub returned null
-            return Collections.emptyList();
-        }
-
-        List<Task> linkedTasks = new ArrayList<>();
-        Map<Long, RepositoryQuery> issuesByRepository = new HashMap<>();
-        for (GetEpicIssueEntryJson issue : epicFromZenHub.getIssues()) {
-            RepositoryQuery repositoryQuery = issuesByRepository.get(issue.getRepo_id());
-            if (repositoryQuery == null) {
-                GHRepository repository = repositoriesGitHubClient.get(issue.getRepo_id());
-
-                repositoryQuery = new RepositoryQuery();
-                repositoryQuery.repoId = issue.getRepo_id();
-                repositoryQuery.owner = repository.getOwnerName();
-                repositoryQuery.name = repository.getName();
-                repositoryQuery.issues = new ArrayList<>();
-                issuesByRepository.put(issue.getRepo_id(), repositoryQuery);
-            }
-
-            repositoryQuery.issues.add(issue.getIssue_number());
-        }
-
-        // Retrieve issues and pull requests by user
-        String query = Templates.issues(issuesByRepository.values()).render();
-        JsonObject response = graphQLClient.graphql("Bearer " + token, new JsonObject().put("query", query));
-        handleErrors(response);
-        JsonObject dataJson = response.getJsonObject("data");
-
-        for (RepositoryQuery repository : issuesByRepository.values()) {
-            JsonObject repoJson = dataJson.getJsonObject("repo_" + repository.getRepoId());
-            for (Integer issue : repository.issues) {
-                Map<String, Task> tasks;
-                JsonObject issueJson = repoJson.getJsonObject("issue_" + issue);
-                if (issueJson != null) {
-                    tasks = jsonToIssueTaskMapper.extractIssueItem(issueJson, defaultAssignee);
-                } else {
-                    tasks = jsonToPullRequestTaskMapper.extractPullRequestItem(repoJson.getJsonObject("pr_" + issue));
-                }
-
-                for (Map.Entry<String, Task> task : tasks.entrySet()) {
-                    if (!linkedTasks.contains(task.getValue())) {
-                        linkedTasks.add(task.getValue());
-                    }
-                }
-            }
-        }
-
-        return linkedTasks;
     }
 
     private void enrichEpic(Epic epic) {

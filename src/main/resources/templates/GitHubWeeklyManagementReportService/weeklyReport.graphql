@@ -1,5 +1,5 @@
 {
-  updated_tasks: search(query: "is:issue label:task -label:recurrent updated:{timeWindow} org:snowdrop repo:team -label:invalid -label:wontfix", type: ISSUE, first: 100) {
+  updated_tasks: search(query: "is:issue label:task -label:recurrent created:{timeWindow} org:snowdrop repo:team -label:invalid -label:wontfix", type: ISSUE, first: 100) {
     nodes {
       ... on Issue {
         number
@@ -108,6 +108,7 @@
       ... on Issue {
         number
         title
+        body
         createdAt
         updatedAt
         url

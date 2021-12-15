@@ -1,5 +1,7 @@
 package io.quarkus.activity.model.mapping;
 
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -52,6 +54,9 @@ public class JsonToIssueTaskMapper extends BaseTaskMapper {
                     issueJson.getInstant("updatedAt"),
                     issueJson.getString("state"),
                     new ArrayList<>(assignees));
+
+            // description
+            task.setDescription(issueJson.getString("body", EMPTY));
 
             // labels
             getLabels(issueJson).forEach(task::addLabel);
