@@ -4,7 +4,15 @@ This project aims at centralizing all the information about the status of Snowdr
 
 ## Running the application in dev mode
 
-You can run your application in dev mode that enables live coding using:
+First, we need to install the ZenHub Java API:
+
+```
+git clone https://github.com/Sgitario/zenhub-api-java-client
+cd zenhub-api-java-client
+mvn clean install -DskipTests
+```
+
+Now, go back to the gh-activity directory and run your application in dev mode using:
 ```shell script
 mvn compile quarkus:dev -Dactivity.token=<GITHUB TOKEN> -Dactivity.zenhub.key=<ZENHUB API KEY>
 ```
